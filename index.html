@@ -5,26 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>英語学習</title>
+<title>IT英語動詞30</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
 :root {
-  --bg: #0f0f0f;
-  --surface: #1c1c1e;
-  --surface2: #2c2c2e;
-  --surface3: #3a3a3c;
-  --border: rgba(255,255,255,0.1);
-  --text: #f5f5f7;
-  --text2: #98989d;
-  --accent: #0a84ff;
-  --accent2: #30d158;
-  --danger: #ff453a;
+  --bg: #0f0f0f; --surface: #1c1c1e; --surface2: #2c2c2e;
+  --border: rgba(255,255,255,0.1); --text: #f5f5f7; --text2: #98989d;
+  --accent: #0a84ff; --accent2: #30d158; --danger: #ff453a;
 }
-
 html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--text); font-family: -apple-system, 'Hiragino Sans', sans-serif; -webkit-font-smoothing: antialiased; }
-
 #app { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
 
 /* header */
@@ -33,35 +23,31 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
   padding: 12px 16px 8px; padding-top: max(12px, env(safe-area-inset-top));
   background: var(--surface); border-bottom: 0.5px solid var(--border); gap: 8px;
 }
-#header h1 { font-size: 15px; font-weight: 600; white-space: nowrap; }
-
-.file-btn {
+#header h1 { font-size: 15px; font-weight: 600; white-space: nowrap; flex: 1; }
+.hdr-btn {
   display: flex; align-items: center; gap: 5px;
   background: var(--surface2); border: 0.5px solid var(--border);
   border-radius: 8px; padding: 6px 10px;
-  color: var(--accent); font-size: 13px; font-weight: 500;
-  cursor: pointer; white-space: nowrap;
+  font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; color: var(--text2);
 }
-.file-btn.green { color: var(--accent2); }
-.file-btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
-.file-btn:active { opacity: 0.7; }
-input[type=file] { display: none; }
+.hdr-btn.on { color: var(--accent); }
+.hdr-btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.hdr-btn:active { opacity: 0.7; }
 
 /* pdf area */
 #pdf-area { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; background: #1a1a1a; position: relative; }
 #pdf-pages { display: flex; flex-direction: column; align-items: center; padding: 8px 0; gap: 4px; }
 #pdf-pages canvas { display: block; max-width: 100%; height: auto; border-radius: 4px; }
+#pdf-pages.spread { gap: 6px; }
+.spread-pair { display: flex; gap: 2px; align-items: flex-start; width: 100%; justify-content: center; }
+.spread-pair canvas { border-radius: 3px; flex-shrink: 0; }
 
-#empty { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; color: var(--text2); }
-#empty .icon { font-size: 56px; opacity: 0.3; }
-#empty p { font-size: 15px; text-align: center; line-height: 1.5; }
-#empty span { color: var(--accent); }
+#loading-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text2); font-size: 14px; }
 
 #page-info {
   position: fixed; top: max(60px, calc(env(safe-area-inset-top) + 48px)); right: 12px;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  color: #fff; font-size: 12px; padding: 3px 8px; border-radius: 10px;
-  pointer-events: none; opacity: 0; transition: opacity 0.3s;
+  background: rgba(0,0,0,0.65); color: #fff; font-size: 12px; padding: 3px 9px;
+  border-radius: 10px; pointer-events: none; opacity: 0; transition: opacity 0.3s;
 }
 #page-info.visible { opacity: 1; }
 
@@ -70,129 +56,55 @@ input[type=file] { display: none; }
   flex-shrink: 0; background: var(--surface); border-top: 0.5px solid var(--border);
   padding: 8px 16px; padding-bottom: max(8px, env(safe-area-inset-bottom));
 }
-
-/* track info row */
 #track-info { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
 #track-name { font-size: 13px; font-weight: 500; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--text2); }
 #track-name.loaded { color: var(--text); }
-
-#library-btn {
-  background: var(--surface2); border: 0.5px solid var(--border);
-  border-radius: 7px; color: var(--accent2); font-size: 11px; font-weight: 500;
-  padding: 4px 10px; cursor: pointer; white-space: nowrap; flex-shrink: 0;
-}
+#library-btn { background: var(--surface2); border: 0.5px solid var(--border); border-radius: 7px; color: var(--accent2); font-size: 11px; font-weight: 500; padding: 4px 10px; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
 #library-btn:active { opacity: 0.7; }
 
-/* progress */
 #progress-wrap { position: relative; margin-bottom: 4px; height: 20px; display: flex; align-items: center; }
-#progress {
-  -webkit-appearance: none; appearance: none; width: 100%; height: 3px;
-  background: var(--surface2); border-radius: 2px; outline: none; cursor: pointer;
-}
-#progress::-webkit-slider-thumb {
-  -webkit-appearance: none; width: 14px; height: 14px;
-  background: #fff; border-radius: 50%; box-shadow: 0 1px 4px rgba(0,0,0,0.4);
-}
+#progress { -webkit-appearance: none; appearance: none; width: 100%; height: 3px; background: var(--surface2); border-radius: 2px; outline: none; cursor: pointer; }
+#progress::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #fff; border-radius: 50%; }
 #progress-fill { position: absolute; left: 0; top: 50%; transform: translateY(-50%); height: 3px; background: var(--accent); border-radius: 2px; pointer-events: none; }
 #time-row { display: flex; justify-content: space-between; font-size: 11px; color: var(--text2); margin-bottom: 6px; }
 
-/* controls */
 #controls { display: flex; align-items: center; justify-content: space-between; }
-.ctrl-btn {
-  background: none; border: none; color: var(--text); cursor: pointer;
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  padding: 4px; border-radius: 8px; min-width: 44px; min-height: 44px; justify-content: center;
-}
+.ctrl-btn { background: none; border: none; color: var(--text); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px; border-radius: 8px; min-width: 44px; min-height: 44px; justify-content: center; }
 .ctrl-btn:active { background: var(--surface2); }
 .ctrl-btn svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .ctrl-btn .lbl { font-size: 10px; color: var(--text2); }
 #play-btn svg { width: 28px; height: 28px; fill: currentColor; stroke: none; color: var(--accent); }
-#play-btn { min-width: 52px; }
-#speed-btn {
-  background: var(--surface2); border: 0.5px solid var(--border); border-radius: 8px;
-  color: var(--accent2); font-size: 13px; font-weight: 600;
-  padding: 6px 10px; cursor: pointer; min-width: 52px; min-height: 44px;
-  display: flex; align-items: center; justify-content: center;
-}
+#speed-btn { background: var(--surface2); border: 0.5px solid var(--border); border-radius: 8px; color: var(--accent2); font-size: 13px; font-weight: 600; padding: 6px 10px; cursor: pointer; min-width: 52px; min-height: 44px; display: flex; align-items: center; justify-content: center; }
 #speed-btn:active { opacity: 0.7; }
 
-/* section row */
 #section-row { display: flex; gap: 6px; margin-top: 6px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
 #section-row::-webkit-scrollbar { display: none; }
 .sec-btn { flex-shrink: 0; background: var(--surface2); border: 0.5px solid var(--border); border-radius: 6px; color: var(--text2); font-size: 11px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
 .sec-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
-
 #add-section-row { display: flex; gap: 6px; margin-top: 5px; align-items: center; }
 #section-label-input { flex: 1; background: var(--surface2); border: 0.5px solid var(--border); border-radius: 6px; color: var(--text); font-size: 12px; padding: 5px 8px; outline: none; }
 #mark-btn { background: var(--accent); border: none; border-radius: 6px; color: #fff; font-size: 12px; font-weight: 500; padding: 5px 10px; cursor: pointer; white-space: nowrap; }
 #mark-btn:active { opacity: 0.7; }
 
-/* ── Library Sheet ── */
-#library-overlay {
-  display: none; position: fixed; inset: 0; z-index: 100;
-  background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-}
+/* Library Sheet */
+#library-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.6); }
 #library-overlay.open { display: flex; align-items: flex-end; }
-
-#library-sheet {
-  width: 100%; background: var(--surface);
-  border-radius: 16px 16px 0 0;
-  padding-bottom: max(16px, env(safe-area-inset-bottom));
-  max-height: 70vh; display: flex; flex-direction: column;
-}
-
-#library-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 14px 16px 10px; border-bottom: 0.5px solid var(--border); flex-shrink: 0;
-}
+#library-sheet { width: 100%; background: var(--surface); border-radius: 16px 16px 0 0; padding-bottom: max(16px, env(safe-area-inset-bottom)); max-height: 75vh; display: flex; flex-direction: column; }
+#library-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
 #library-header h2 { font-size: 15px; font-weight: 600; }
-
-#library-close {
-  background: var(--surface2); border: none; border-radius: 50%;
-  width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; color: var(--text2); font-size: 16px; line-height: 1;
-}
+#library-close { background: var(--surface2); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 16px; }
 #library-close:active { opacity: 0.7; }
-
 #library-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
-.lib-item {
-  display: flex; align-items: center; gap: 10px;
-  padding: 11px 16px; border-bottom: 0.5px solid var(--border); cursor: pointer;
-}
+.lib-group-label { padding: 10px 16px 4px; font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; background: var(--bg); position: sticky; top: 0; z-index: 1; }
+.lib-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
 .lib-item:active { background: var(--surface2); }
 .lib-item.playing { background: rgba(10,132,255,0.08); }
-
-.lib-icon { width: 36px; height: 36px; border-radius: 8px; background: var(--surface2); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-.lib-icon svg { width: 16px; height: 16px; fill: none; stroke: var(--accent2); stroke-width: 2; stroke-linecap: round; }
-.lib-item.playing .lib-icon { background: rgba(10,132,255,0.15); }
-.lib-item.playing .lib-icon svg { stroke: var(--accent); }
-
-.lib-meta { flex: 1; overflow: hidden; }
-.lib-title { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lib-num { width: 28px; height: 28px; border-radius: 6px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--text2); flex-shrink: 0; }
+.lib-item.playing .lib-num { background: rgba(10,132,255,0.2); color: var(--accent); }
+.lib-title { font-size: 13px; font-weight: 500; flex: 1; }
 .lib-item.playing .lib-title { color: var(--accent); }
-.lib-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
-
-.lib-del {
-  background: none; border: none; color: var(--text2); cursor: pointer;
-  padding: 8px; border-radius: 6px; font-size: 16px; line-height: 1; flex-shrink: 0;
-}
-.lib-del:active { color: var(--danger); background: rgba(255,69,58,0.1); }
-
-#library-empty { padding: 32px 16px; text-align: center; color: var(--text2); font-size: 14px; line-height: 1.6; }
-#library-empty span { color: var(--accent2); }
-
-#lib-add-row {
-  padding: 10px 16px 0; flex-shrink: 0;
-  border-top: 0.5px solid var(--border);
-  display: flex; justify-content: center;
-}
-#lib-add-btn {
-  background: var(--accent); border: none; border-radius: 10px;
-  color: #fff; font-size: 14px; font-weight: 600;
-  padding: 10px 0; cursor: pointer; width: 100%;
-}
-#lib-add-btn:active { opacity: 0.8; }
+.lib-now { font-size: 10px; color: var(--accent); margin-top: 1px; }
 
 audio { display: none; }
 </style>
@@ -200,47 +112,30 @@ audio { display: none; }
 <body>
 <div id="app">
   <header id="header">
-    <h1>📖 英語学習</h1>
-    <div style="display:flex;gap:8px">
-      <label class="file-btn" for="pdf-input">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        PDF
-      </label>
-      <input type="file" id="pdf-input" accept=".pdf">
-      <label class="file-btn green" for="audio-add-input">
-        <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        音声追加
-      </label>
-      <input type="file" id="audio-add-input" accept="audio/*" multiple>
-    </div>
+    <h1>📖 IT英語動詞30</h1>
+    <button id="spread-btn" class="hdr-btn" aria-label="見開き切替">
+      <svg viewBox="0 0 24 24"><rect x="2" y="4" width="9" height="16" rx="1"/><rect x="13" y="4" width="9" height="16" rx="1"/></svg>
+      見開き
+    </button>
   </header>
 
   <div id="pdf-area">
-    <div id="empty">
-      <div class="icon">📄</div>
-      <p>PDFファイルを読み込んでください<br><span>上のPDFボタンをタップ</span></p>
-    </div>
+    <div id="loading-msg">読み込み中...</div>
     <div id="pdf-pages"></div>
   </div>
-
   <div id="page-info" aria-live="polite"></div>
 
   <div id="player-bar">
     <div id="track-info">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-      <span id="track-name">音声ファイルを読み込んでください</span>
-      <button id="library-btn">ライブラリ ▾</button>
+      <span id="track-name">トラックを選択してください</span>
+      <button id="library-btn">トラック一覧 ▾</button>
     </div>
-
     <div id="progress-wrap">
       <div id="progress-fill" style="width:0%"></div>
       <input type="range" id="progress" min="0" max="100" value="0" step="0.1">
     </div>
-    <div id="time-row">
-      <span id="current-time">0:00</span>
-      <span id="duration">0:00</span>
-    </div>
-
+    <div id="time-row"><span id="current-time">0:00</span><span id="duration">0:00</span></div>
     <div id="controls">
       <button class="ctrl-btn" id="back10-btn" aria-label="10秒戻す">
         <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="14.5" text-anchor="middle" font-size="6" fill="currentColor" stroke="none" font-weight="700">10</text></svg>
@@ -255,7 +150,6 @@ audio { display: none; }
       </button>
       <button id="speed-btn" aria-label="再生速度">1.0×</button>
     </div>
-
     <div id="section-row"></div>
     <div id="add-section-row">
       <input type="text" id="section-label-input" placeholder="セクション名（省略可）" maxlength="20">
@@ -268,14 +162,10 @@ audio { display: none; }
 <div id="library-overlay">
   <div id="library-sheet">
     <div id="library-header">
-      <h2>🎵 音声ライブラリ</h2>
+      <h2>🎵 トラック一覧</h2>
       <button id="library-close">✕</button>
     </div>
     <div id="library-list"></div>
-    <div id="lib-add-row">
-      <label id="lib-add-btn" for="audio-add-input2">＋ 音声ファイルを追加</label>
-      <input type="file" id="audio-add-input2" accept="audio/*" multiple>
-    </div>
   </div>
 </div>
 
@@ -284,6 +174,57 @@ audio { display: none; }
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
+// ── ファイル定義 ─────────────────────────────
+const PDF_FILE = 'IT英語動詞30.pdf';
+
+const TRACKS = [
+  { group: 'Unit 01 — 基本動詞', file: '01_01_Do.mp3',         label: 'Do' },
+  { group: 'Unit 01 — 基本動詞', file: '01_02_Have.mp3',       label: 'Have' },
+  { group: 'Unit 01 — 基本動詞', file: '01_03_Get1.mp3',       label: 'Get (1)' },
+  { group: 'Unit 01 — 基本動詞', file: '01_04_Get2.mp3',       label: 'Get (2)' },
+  { group: 'Unit 01 — 基本動詞', file: '01_05_Get3.mp3',       label: 'Get (3)' },
+  { group: 'Unit 01 — 基本動詞', file: '01_06_Give.mp3',       label: 'Give' },
+  { group: 'Unit 01 — 基本動詞', file: '01_07_Make.mp3',       label: 'Make' },
+  { group: 'Unit 01 — 基本動詞', file: '01_08_Take.mp3',       label: 'Take' },
+  { group: 'Unit 01 — 基本動詞', file: '01_09_Put.mp3',        label: 'Put' },
+  { group: 'Unit 01 — 基本動詞', file: '01_10_Go.mp3',         label: 'Go' },
+  { group: 'Unit 01 — 基本動詞', file: '01_11_Come.mp3',       label: 'Come' },
+  { group: 'Unit 01 — 基本動詞', file: '01_12_Look.mp3',       label: 'Look' },
+  { group: 'Unit 02 — IT動詞',   file: '02_01_Be.mp3',         label: 'Be' },
+  { group: 'Unit 02 — IT動詞',   file: '02_02_Need.mp3',       label: 'Need' },
+  { group: 'Unit 02 — IT動詞',   file: '02_03_Work.mp3',       label: 'Work' },
+  { group: 'Unit 02 — IT動詞',   file: '02_04_Find.mp3',       label: 'Find' },
+  { group: 'Unit 02 — IT動詞',   file: '02_05_Run.mp3',        label: 'Run' },
+  { group: 'Unit 02 — IT動詞',   file: '02_06_Follow up.mp3',  label: 'Follow up' },
+  { group: 'Unit 02 — IT動詞',   file: '02_07_Update.mp3',     label: 'Update' },
+  { group: 'Unit 02 — IT動詞',   file: '02_08_Help.mp3',       label: 'Help' },
+  { group: 'Unit 02 — IT動詞',   file: '02_09_Happen.mp3',     label: 'Happen' },
+  { group: 'Unit 02 — IT動詞',   file: '02_10_Seem.mp3',       label: 'Seem' },
+  { group: 'Unit 02 — IT動詞',   file: '02_11_Discuss.mp3',    label: 'Discuss' },
+  { group: 'Unit 02 — IT動詞',   file: '02_12_Learn.mp3',      label: 'Learn' },
+  { group: 'Unit 02 — IT動詞',   file: '02_13_Call out.mp3',   label: 'Call out' },
+  { group: 'Unit 02 — IT動詞',   file: '02_14_Block.mp3',      label: 'Block' },
+  { group: 'Unit 02 — IT動詞',   file: '02_15_Capture.mp3',    label: 'Capture' },
+  { group: 'Unit 02 — IT動詞',   file: '02_16_Execute.mp3',    label: 'Execute' },
+  { group: 'Unit 02 — IT動詞',   file: '02_17_Conduct.mp3',    label: 'Conduct' },
+  { group: 'Unit 02 — IT動詞',   file: '02_18_Store.mp3',      label: 'Store' },
+  { group: 'Unit 02 — IT動詞',   file: '02_19_Talk.mp3',       label: 'Talk' },
+  { group: 'Unit 02 — IT動詞',   file: '02_20_Align.mp3',      label: 'Align' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 1.mp3',  label: 'Conversation 1' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 2.mp3',  label: 'Conversation 2' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 3.mp3',  label: 'Conversation 3' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 4.mp3',  label: 'Conversation 4' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 5.mp3',  label: 'Conversation 5' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 6.mp3',  label: 'Conversation 6' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 7.mp3',  label: 'Conversation 7' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 8.mp3',  label: 'Conversation 8' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 9.mp3',  label: 'Conversation 9' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 10.mp3', label: 'Conversation 10' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 11.mp3', label: 'Conversation 11' },
+  { group: 'Unit 03 — 会話練習', file: '03_Conversation 12.mp3', label: 'Conversation 12' },
+];
+
+// ── 状態 ──────────────────────────────────────
 const audio = document.getElementById('audio');
 const playBtn = document.getElementById('play-btn');
 const playIcon = document.getElementById('play-icon');
@@ -303,174 +244,64 @@ const pdfArea = document.getElementById('pdf-area');
 const libraryOverlay = document.getElementById('library-overlay');
 const libraryList = document.getElementById('library-list');
 
-// State
 const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 let speedIdx = 2;
 let sections = [];
 let pageInfoTimer;
+let currentTrackIdx = null;
+let spreadMode = false;
+let currentPdfDoc = null;
+let currentPdfTotal = 0;
 
-// Library: { id, name, url, size }
-let library = [];
-let currentTrackId = null;
-
-// ── Audio Library ──────────────────────────────
-
-function addFilesToLibrary(files) {
-  Array.from(files).forEach(file => {
-    const existing = library.find(t => t.name === file.name && t.size === file.size);
-    if (existing) return;
-    const url = URL.createObjectURL(file);
-    const id = Date.now() + Math.random();
-    library.push({ id, name: file.name.replace(/\.[^.]+$/, ''), url, size: file.size, rawName: file.name });
-  });
-  renderLibrary();
-  saveLibraryMeta();
-}
-
+// ── ライブラリ描画 ────────────────────────────
 function renderLibrary() {
-  if (library.length === 0) {
-    libraryList.innerHTML = '<div id="library-empty">音声ファイルがありません<br><span>ボタンから追加してください</span></div>';
-    return;
-  }
   libraryList.innerHTML = '';
-  library.forEach(track => {
+  let lastGroup = '';
+  TRACKS.forEach((t, i) => {
+    if (t.group !== lastGroup) {
+      const g = document.createElement('div');
+      g.className = 'lib-group-label';
+      g.textContent = t.group;
+      libraryList.appendChild(g);
+      lastGroup = t.group;
+    }
     const item = document.createElement('div');
-    item.className = 'lib-item' + (track.id === currentTrackId ? ' playing' : '');
+    item.className = 'lib-item' + (i === currentTrackIdx ? ' playing' : '');
+    const numStr = String(i + 1).padStart(2, '0');
     item.innerHTML = `
-      <div class="lib-icon">
-        <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      <div class="lib-num">${numStr}</div>
+      <div style="flex:1;overflow:hidden">
+        <div class="lib-title">${t.label}</div>
+        ${i === currentTrackIdx ? '<div class="lib-now">▶ 再生中</div>' : ''}
       </div>
-      <div class="lib-meta">
-        <div class="lib-title">${escHtml(track.name)}</div>
-        <div class="lib-sub">${track.id === currentTrackId ? '▶ 再生中' : 'タップして再生'}</div>
-      </div>
-      <button class="lib-del" data-id="${track.id}" aria-label="削除">🗑</button>
     `;
-    item.addEventListener('click', e => {
-      if (e.target.closest('.lib-del')) return;
-      playTrack(track.id);
-      closeLibrary();
-    });
-    item.querySelector('.lib-del').addEventListener('click', e => {
-      e.stopPropagation();
-      removeTrack(track.id);
-    });
+    item.addEventListener('click', () => { playTrack(i); closeLibrary(); });
     libraryList.appendChild(item);
   });
 }
 
-function playTrack(id) {
-  const track = library.find(t => t.id === id);
-  if (!track) return;
-  const wasPlaying = !audio.paused;
-  audio.src = track.url;
+function playTrack(idx) {
+  saveSections();
+  currentTrackIdx = idx;
+  const t = TRACKS[idx];
+  audio.src = encodeURIComponent(t.file);
   audio.playbackRate = speeds[speedIdx];
-  currentTrackId = id;
-  trackName.textContent = track.name;
+  trackName.textContent = t.label;
   trackName.classList.add('loaded');
-  // セクションをトラックごとに保存・復元
-  saveSections();
-  sections = loadSectionsForTrack(id);
+  sections = loadSectionsForTrack(idx);
   renderSections();
-  if (wasPlaying || currentTrackId) audio.play().catch(() => {});
-  renderLibrary();
+  audio.play().catch(() => {});
 }
 
-function removeTrack(id) {
-  const idx = library.findIndex(t => t.id === id);
-  if (idx < 0) return;
-  URL.revokeObjectURL(library[idx].url);
-  library.splice(idx, 1);
-  if (currentTrackId === id) {
-    audio.pause();
-    audio.src = '';
-    currentTrackId = null;
-    trackName.textContent = '音声ファイルを読み込んでください';
-    trackName.classList.remove('loaded');
-    sections = [];
-    renderSections();
-  }
-  renderLibrary();
-  saveLibraryMeta();
-}
-
-function escHtml(s) { return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-// ── Section management (per track) ─────────────
-
-function sectionsKey(id) { return 'eng_sec_' + id; }
-
+// ── セクション ────────────────────────────────
+function sectionsKey(idx) { return 'it_sec_' + idx; }
 function saveSections() {
-  if (!currentTrackId) return;
-  try { localStorage.setItem(sectionsKey(currentTrackId), JSON.stringify(sections)); } catch(e) {}
+  if (currentTrackIdx === null) return;
+  try { localStorage.setItem(sectionsKey(currentTrackIdx), JSON.stringify(sections)); } catch(e) {}
 }
-
-function loadSectionsForTrack(id) {
-  try {
-    const s = localStorage.getItem(sectionsKey(id));
-    return s ? JSON.parse(s) : [];
-  } catch(e) { return []; }
+function loadSectionsForTrack(idx) {
+  try { const s = localStorage.getItem(sectionsKey(idx)); return s ? JSON.parse(s) : []; } catch(e) { return []; }
 }
-
-function saveLibraryMeta() {
-  try {
-    const meta = library.map(t => ({ id: t.id, name: t.name, size: t.size, rawName: t.rawName }));
-    localStorage.setItem('eng_lib_meta', JSON.stringify(meta));
-  } catch(e) {}
-}
-
-// ── Audio events ──────────────────────────────
-
-function fmt(s) {
-  s = Math.floor(s || 0);
-  return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
-}
-
-function updateProgress() {
-  if (!audio.duration) return;
-  const pct = (audio.currentTime / audio.duration) * 100;
-  progress.value = pct;
-  progressFill.style.width = pct + '%';
-  currentTimeEl.textContent = fmt(audio.currentTime);
-  durationEl.textContent = fmt(audio.duration);
-}
-
-function setPlayIcon(playing) {
-  playIcon.innerHTML = playing
-    ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'
-    : '<path d="M8 5v14l11-7z"/>';
-}
-
-audio.addEventListener('timeupdate', updateProgress);
-audio.addEventListener('loadedmetadata', () => { durationEl.textContent = fmt(audio.duration); });
-audio.addEventListener('play', () => setPlayIcon(true));
-audio.addEventListener('pause', () => setPlayIcon(false));
-audio.addEventListener('ended', () => setPlayIcon(false));
-
-playBtn.addEventListener('click', () => { if (audio.src) { audio.paused ? audio.play() : audio.pause(); } });
-backBtn.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 10); });
-fwdBtn.addEventListener('click', () => { audio.currentTime = Math.min(audio.duration || 0, audio.currentTime + 10); });
-
-progress.addEventListener('input', () => {
-  if (audio.duration) { audio.currentTime = (progress.value / 100) * audio.duration; progressFill.style.width = progress.value + '%'; }
-});
-
-speedBtn.addEventListener('click', () => {
-  speedIdx = (speedIdx + 1) % speeds.length;
-  audio.playbackRate = speeds[speedIdx];
-  speedBtn.textContent = speeds[speedIdx].toFixed(2).replace(/\.?0+$/, '') + '×';
-});
-
-markBtn.addEventListener('click', () => {
-  if (!audio.src) return;
-  const t = audio.currentTime;
-  const label = labelInput.value.trim() || fmt(t);
-  sections.push({ t, label });
-  labelInput.value = '';
-  renderSections();
-  saveSections();
-});
-
 function renderSections() {
   sectionRow.innerHTML = '';
   sections.forEach((s, i) => {
@@ -483,67 +314,112 @@ function renderSections() {
   });
 }
 
-// ── File inputs ──────────────────────────────
-
-function handleAudioFiles(e) {
-  const files = e.target.files;
-  if (!files.length) return;
-  addFilesToLibrary(files);
-  // 1ファイルだけなら即再生
-  if (files.length === 1) {
-    const added = library[library.length - 1];
-    playTrack(added.id);
-  } else {
-    openLibrary();
-  }
-  e.target.value = '';
+// ── 音声イベント ──────────────────────────────
+function fmt(s) { s = Math.floor(s||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
+function updateProgress() {
+  if (!audio.duration) return;
+  const pct = (audio.currentTime / audio.duration) * 100;
+  progress.value = pct; progressFill.style.width = pct + '%';
+  currentTimeEl.textContent = fmt(audio.currentTime);
+  durationEl.textContent = fmt(audio.duration);
 }
+function setPlayIcon(p) { playIcon.innerHTML = p ? '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>' : '<path d="M8 5v14l11-7z"/>'; }
 
-document.getElementById('audio-add-input').addEventListener('change', handleAudioFiles);
-document.getElementById('audio-add-input2').addEventListener('change', handleAudioFiles);
-
-document.getElementById('pdf-input').addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  loadPDF(file);
+audio.addEventListener('timeupdate', updateProgress);
+audio.addEventListener('loadedmetadata', () => { durationEl.textContent = fmt(audio.duration); });
+audio.addEventListener('play', () => setPlayIcon(true));
+audio.addEventListener('pause', () => setPlayIcon(false));
+audio.addEventListener('ended', () => {
+  setPlayIcon(false);
+  // 次のトラックへ自動進行
+  if (currentTrackIdx !== null && currentTrackIdx < TRACKS.length - 1) {
+    playTrack(currentTrackIdx + 1);
+    renderLibrary();
+  }
 });
 
-// ── Library Sheet ──────────────────────────────
+playBtn.addEventListener('click', () => { if (audio.src) { audio.paused ? audio.play() : audio.pause(); } });
+backBtn.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 10); });
+fwdBtn.addEventListener('click', () => { audio.currentTime = Math.min(audio.duration||0, audio.currentTime + 10); });
+progress.addEventListener('input', () => {
+  if (audio.duration) { audio.currentTime = (progress.value/100)*audio.duration; progressFill.style.width = progress.value+'%'; }
+});
+speedBtn.addEventListener('click', () => {
+  speedIdx = (speedIdx + 1) % speeds.length;
+  audio.playbackRate = speeds[speedIdx];
+  speedBtn.textContent = speeds[speedIdx].toFixed(2).replace(/\.?0+$/,'') + '×';
+});
+markBtn.addEventListener('click', () => {
+  if (!audio.src) return;
+  const t = audio.currentTime;
+  sections.push({ t, label: labelInput.value.trim() || fmt(t) });
+  labelInput.value = '';
+  renderSections(); saveSections();
+});
 
-function openLibrary() {
-  renderLibrary();
-  libraryOverlay.classList.add('open');
-}
+// ── ライブラリUI ──────────────────────────────
+function openLibrary() { renderLibrary(); libraryOverlay.classList.add('open'); }
 function closeLibrary() { libraryOverlay.classList.remove('open'); }
-
 document.getElementById('library-btn').addEventListener('click', openLibrary);
 document.getElementById('library-close').addEventListener('click', closeLibrary);
 libraryOverlay.addEventListener('click', e => { if (e.target === libraryOverlay) closeLibrary(); });
 
-// ── PDF ──────────────────────────────────────
+// ── 見開きボタン ──────────────────────────────
+const spreadBtn = document.getElementById('spread-btn');
+spreadBtn.addEventListener('click', () => {
+  spreadMode = !spreadMode;
+  spreadBtn.classList.toggle('on', spreadMode);
+  if (currentPdfDoc) rerenderPDF();
+});
 
-async function loadPDF(file) {
-  const empty = document.getElementById('empty');
+// ── PDF ──────────────────────────────────────
+async function loadPDF() {
+  const loadingMsg = document.getElementById('loading-msg');
+  try {
+    const url = encodeURIComponent(PDF_FILE);
+    currentPdfDoc = await pdfjsLib.getDocument(url).promise;
+    currentPdfTotal = currentPdfDoc.numPages;
+    loadingMsg.style.display = 'none';
+    await rerenderPDF();
+  } catch(e) {
+    loadingMsg.textContent = 'PDFの読み込みに失敗しました';
+  }
+}
+
+async function rerenderPDF() {
   const pagesDiv = document.getElementById('pdf-pages');
-  empty.style.display = 'none';
-  pagesDiv.innerHTML = '<p style="color:#666;padding:20px;text-align:center;font-size:13px">読み込み中...</p>';
-  const ab = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
   pagesDiv.innerHTML = '';
   const vw = pdfArea.clientWidth;
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const vp0 = page.getViewport({ scale: 1 });
-    const scale = (vw - 16) / vp0.width;
-    const vp = page.getViewport({ scale });
-    const canvas = document.createElement('canvas');
-    canvas.width = vp.width; canvas.height = vp.height;
-    canvas.style.width = vp.width + 'px'; canvas.style.height = vp.height + 'px';
-    canvas.dataset.page = i;
-    pagesDiv.appendChild(canvas);
-    await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+  if (spreadMode) {
+    pagesDiv.classList.add('spread');
+    for (let i = 1; i <= currentPdfTotal; ) {
+      if (i === 1) {
+        const c = await renderPage(i, vw - 16); c.dataset.page = i; pagesDiv.appendChild(c); i++;
+      } else {
+        const pair = document.createElement('div'); pair.className = 'spread-pair';
+        const c1 = await renderPage(i, Math.floor((vw-8)/2)); c1.dataset.page = i; pair.appendChild(c1); i++;
+        if (i <= currentPdfTotal) { const c2 = await renderPage(i, Math.floor((vw-8)/2)); c2.dataset.page = i; pair.appendChild(c2); i++; }
+        pagesDiv.appendChild(pair);
+      }
+    }
+  } else {
+    pagesDiv.classList.remove('spread');
+    for (let i = 1; i <= currentPdfTotal; i++) {
+      const c = await renderPage(i, vw - 16); c.dataset.page = i; pagesDiv.appendChild(c);
+    }
   }
-  setupPageObserver(pdf.numPages);
+  setupPageObserver(currentPdfTotal);
+}
+
+async function renderPage(pageNum, widthPx) {
+  const page = await currentPdfDoc.getPage(pageNum);
+  const vp0 = page.getViewport({ scale: 1 });
+  const vp = page.getViewport({ scale: widthPx / vp0.width });
+  const canvas = document.createElement('canvas');
+  canvas.width = vp.width; canvas.height = vp.height;
+  canvas.style.width = vp.width + 'px'; canvas.style.height = vp.height + 'px';
+  await page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+  return canvas;
 }
 
 function setupPageObserver(total) {
@@ -556,12 +432,12 @@ function setupPageObserver(total) {
         pageInfoTimer = setTimeout(() => pageInfo.classList.remove('visible'), 1800);
       }
     });
-  }, { threshold: 0.5 });
-  document.querySelectorAll('#pdf-pages canvas').forEach(c => obs.observe(c));
+  }, { threshold: 0.3 });
+  document.querySelectorAll('#pdf-pages canvas[data-page]').forEach(c => obs.observe(c));
 }
 
-// ── Init ──────────────────────────────────────
-renderLibrary();
+// ── 起動 ─────────────────────────────────────
+loadPDF();
 </script>
 </body>
 </html>
