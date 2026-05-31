@@ -393,8 +393,9 @@ let pageInfoTimer;
 let currentMaterial = null;   // MATERIALSのオブジェクト
 let currentTrackIdx = null;
 let spreadMode = false;
-let currentPdfDoc = null;
+let currentPdfDocs = [];
 let currentPdfTotal = 0;
+let currentPdfDoc = null;
 
 // ── 教材切替 ──────────────────────────────────
 function selectMaterial(mat) {
@@ -565,13 +566,6 @@ spreadBtn.addEventListener('click', () => {
 });
 
 // ── PDF ──────────────────────────────────────
-// currentPdfDoc は単一 or 配列に対応
-// pdfFiles: string | string[]
-
-let currentPdfDocs = [];   // 複数ファイル対応（常に配列で管理）
-let currentPdfTotal = 0;
-// 後方互換のため currentPdfDoc は最初の1件を指す
-let currentPdfDoc = null;
 
 async function loadPDF() {
   const loadingMsg = document.getElementById('loading-msg');
