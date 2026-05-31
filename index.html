@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>IT英語動詞30</title>
+<title>英語学習</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -19,18 +19,27 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 
 /* header */
 #header {
-  flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0; display: flex; align-items: center;
   padding: 12px 16px 8px; padding-top: max(12px, env(safe-area-inset-top));
   background: var(--surface); border-bottom: 0.5px solid var(--border); gap: 8px;
 }
-#header h1 { font-size: 15px; font-weight: 600; white-space: nowrap; flex: 1; }
+#material-btn {
+  flex: 1; display: flex; align-items: center; gap: 6px;
+  background: var(--surface2); border: 0.5px solid var(--border);
+  border-radius: 8px; padding: 7px 10px; cursor: pointer; overflow: hidden;
+}
+#material-btn:active { opacity: 0.7; }
+#material-btn .icon { font-size: 16px; flex-shrink: 0; }
+#material-name { font-size: 13px; font-weight: 600; flex: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--text); }
+#material-btn .arrow { color: var(--text2); font-size: 11px; flex-shrink: 0; }
+
 .hdr-btn {
-  display: flex; align-items: center; gap: 5px;
+  display: flex; align-items: center; gap: 5px; flex-shrink: 0;
   background: var(--surface2); border: 0.5px solid var(--border);
   border-radius: 8px; padding: 6px 10px;
   font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; color: var(--text2);
 }
-.hdr-btn.on { color: var(--accent); }
+.hdr-btn.on { color: var(--accent); border-color: var(--accent); }
 .hdr-btn svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
 .hdr-btn:active { opacity: 0.7; }
 
@@ -42,7 +51,9 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 .spread-pair { display: flex; gap: 2px; align-items: flex-start; width: 100%; justify-content: center; }
 .spread-pair canvas { border-radius: 3px; flex-shrink: 0; }
 
-#loading-msg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--text2); font-size: 14px; }
+#loading-msg { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--text2); font-size: 14px; }
+#loading-msg .spinner { width: 28px; height: 28px; border: 2px solid var(--surface2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
 #page-info {
   position: fixed; top: max(60px, calc(env(safe-area-inset-top) + 48px)); right: 12px;
@@ -80,22 +91,33 @@ html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(-
 #section-row { display: flex; gap: 6px; margin-top: 6px; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; }
 #section-row::-webkit-scrollbar { display: none; }
 .sec-btn { flex-shrink: 0; background: var(--surface2); border: 0.5px solid var(--border); border-radius: 6px; color: var(--text2); font-size: 11px; padding: 4px 10px; cursor: pointer; white-space: nowrap; }
-.sec-btn:active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.sec-btn:active { background: var(--accent); color: #fff; }
 #add-section-row { display: flex; gap: 6px; margin-top: 5px; align-items: center; }
 #section-label-input { flex: 1; background: var(--surface2); border: 0.5px solid var(--border); border-radius: 6px; color: var(--text); font-size: 12px; padding: 5px 8px; outline: none; }
 #mark-btn { background: var(--accent); border: none; border-radius: 6px; color: #fff; font-size: 12px; font-weight: 500; padding: 5px 10px; cursor: pointer; white-space: nowrap; }
 #mark-btn:active { opacity: 0.7; }
 
-/* Library Sheet */
-#library-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.6); }
-#library-overlay.open { display: flex; align-items: flex-end; }
-#library-sheet { width: 100%; background: var(--surface); border-radius: 16px 16px 0 0; padding-bottom: max(16px, env(safe-area-inset-bottom)); max-height: 75vh; display: flex; flex-direction: column; }
-#library-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
-#library-header h2 { font-size: 15px; font-weight: 600; }
-#library-close { background: var(--surface2); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 16px; }
-#library-close:active { opacity: 0.7; }
-#library-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+/* ── 共通シート ── */
+.sheet-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.6); }
+.sheet-overlay.open { display: flex; align-items: flex-end; }
+.sheet { width: 100%; background: var(--surface); border-radius: 16px 16px 0 0; padding-bottom: max(16px, env(safe-area-inset-bottom)); max-height: 75vh; display: flex; flex-direction: column; }
+.sheet-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 10px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+.sheet-header h2 { font-size: 15px; font-weight: 600; }
+.sheet-close { background: var(--surface2); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); font-size: 16px; }
+.sheet-close:active { opacity: 0.7; }
+.sheet-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 
+/* 教材選択シート */
+.mat-item { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
+.mat-item:active { background: var(--surface2); }
+.mat-item.active { background: rgba(10,132,255,0.08); }
+.mat-icon { font-size: 28px; flex-shrink: 0; }
+.mat-meta { flex: 1; overflow: hidden; }
+.mat-title { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mat-item.active .mat-title { color: var(--accent); }
+.mat-sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* ライブラリシート */
 .lib-group-label { padding: 10px 16px 4px; font-size: 11px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.05em; background: var(--bg); position: sticky; top: 0; z-index: 1; }
 .lib-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
 .lib-item:active { background: var(--surface2); }
@@ -112,7 +134,11 @@ audio { display: none; }
 <body>
 <div id="app">
   <header id="header">
-    <h1>📖 IT英語動詞30</h1>
+    <div id="material-btn">
+      <span class="icon">📚</span>
+      <span id="material-name">教材を選択</span>
+      <span class="arrow">▾</span>
+    </div>
     <button id="spread-btn" class="hdr-btn" aria-label="見開き切替">
       <svg viewBox="0 0 24 24"><rect x="2" y="4" width="9" height="16" rx="1"/><rect x="13" y="4" width="9" height="16" rx="1"/></svg>
       見開き
@@ -120,7 +146,10 @@ audio { display: none; }
   </header>
 
   <div id="pdf-area">
-    <div id="loading-msg">読み込み中...</div>
+    <div id="loading-msg">
+      <div class="spinner"></div>
+      <span>教材を選択してください</span>
+    </div>
     <div id="pdf-pages"></div>
   </div>
   <div id="page-info" aria-live="polite"></div>
@@ -137,18 +166,18 @@ audio { display: none; }
     </div>
     <div id="time-row"><span id="current-time">0:00</span><span id="duration">0:00</span></div>
     <div id="controls">
-      <button class="ctrl-btn" id="back10-btn" aria-label="10秒戻す">
+      <button class="ctrl-btn" id="back10-btn">
         <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="14.5" text-anchor="middle" font-size="6" fill="currentColor" stroke="none" font-weight="700">10</text></svg>
         <span class="lbl">10秒戻し</span>
       </button>
-      <button class="ctrl-btn" id="play-btn" aria-label="再生">
+      <button class="ctrl-btn" id="play-btn">
         <svg id="play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
       </button>
-      <button class="ctrl-btn" id="fwd10-btn" aria-label="10秒送り">
+      <button class="ctrl-btn" id="fwd10-btn">
         <svg viewBox="0 0 24 24"><path d="M12 5V1l5 5-5 5V7c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6h2c0 4.42-3.58 8-8 8s-8-3.58-8-8 3.58-8 8-8z"/><text x="12" y="14.5" text-anchor="middle" font-size="6" fill="currentColor" stroke="none" font-weight="700">10</text></svg>
         <span class="lbl">10秒送り</span>
       </button>
-      <button id="speed-btn" aria-label="再生速度">1.0×</button>
+      <button id="speed-btn">1.0×</button>
     </div>
     <div id="section-row"></div>
     <div id="add-section-row">
@@ -158,14 +187,25 @@ audio { display: none; }
   </div>
 </div>
 
-<!-- Library Sheet -->
-<div id="library-overlay">
-  <div id="library-sheet">
-    <div id="library-header">
-      <h2>🎵 トラック一覧</h2>
-      <button id="library-close">✕</button>
+<!-- 教材選択シート -->
+<div id="material-overlay" class="sheet-overlay">
+  <div class="sheet">
+    <div class="sheet-header">
+      <h2>📚 教材を選択</h2>
+      <button class="sheet-close" id="material-close">✕</button>
     </div>
-    <div id="library-list"></div>
+    <div class="sheet-list" id="material-list"></div>
+  </div>
+</div>
+
+<!-- トラック一覧シート -->
+<div id="library-overlay" class="sheet-overlay">
+  <div class="sheet">
+    <div class="sheet-header">
+      <h2>🎵 トラック一覧</h2>
+      <button class="sheet-close" id="library-close">✕</button>
+    </div>
+    <div class="sheet-list" id="library-list"></div>
   </div>
 </div>
 
@@ -174,57 +214,164 @@ audio { display: none; }
 <script>
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// ── ファイル定義 ─────────────────────────────
-const PDF_FILE = 'IT英語動詞30.pdf';
-
-const TRACKS = [
-  { group: 'Unit 01 — 基本動詞', file: '01_01_Do.mp3',         label: 'Do' },
-  { group: 'Unit 01 — 基本動詞', file: '01_02_Have.mp3',       label: 'Have' },
-  { group: 'Unit 01 — 基本動詞', file: '01_03_Get1.mp3',       label: 'Get (1)' },
-  { group: 'Unit 01 — 基本動詞', file: '01_04_Get2.mp3',       label: 'Get (2)' },
-  { group: 'Unit 01 — 基本動詞', file: '01_05_Get3.mp3',       label: 'Get (3)' },
-  { group: 'Unit 01 — 基本動詞', file: '01_06_Give.mp3',       label: 'Give' },
-  { group: 'Unit 01 — 基本動詞', file: '01_07_Make.mp3',       label: 'Make' },
-  { group: 'Unit 01 — 基本動詞', file: '01_08_Take.mp3',       label: 'Take' },
-  { group: 'Unit 01 — 基本動詞', file: '01_09_Put.mp3',        label: 'Put' },
-  { group: 'Unit 01 — 基本動詞', file: '01_10_Go.mp3',         label: 'Go' },
-  { group: 'Unit 01 — 基本動詞', file: '01_11_Come.mp3',       label: 'Come' },
-  { group: 'Unit 01 — 基本動詞', file: '01_12_Look.mp3',       label: 'Look' },
-  { group: 'Unit 02 — IT動詞',   file: '02_01_Be.mp3',         label: 'Be' },
-  { group: 'Unit 02 — IT動詞',   file: '02_02_Need.mp3',       label: 'Need' },
-  { group: 'Unit 02 — IT動詞',   file: '02_03_Work.mp3',       label: 'Work' },
-  { group: 'Unit 02 — IT動詞',   file: '02_04_Find.mp3',       label: 'Find' },
-  { group: 'Unit 02 — IT動詞',   file: '02_05_Run.mp3',        label: 'Run' },
-  { group: 'Unit 02 — IT動詞',   file: '02_06_Follow up.mp3',  label: 'Follow up' },
-  { group: 'Unit 02 — IT動詞',   file: '02_07_Update.mp3',     label: 'Update' },
-  { group: 'Unit 02 — IT動詞',   file: '02_08_Help.mp3',       label: 'Help' },
-  { group: 'Unit 02 — IT動詞',   file: '02_09_Happen.mp3',     label: 'Happen' },
-  { group: 'Unit 02 — IT動詞',   file: '02_10_Seem.mp3',       label: 'Seem' },
-  { group: 'Unit 02 — IT動詞',   file: '02_11_Discuss.mp3',    label: 'Discuss' },
-  { group: 'Unit 02 — IT動詞',   file: '02_12_Learn.mp3',      label: 'Learn' },
-  { group: 'Unit 02 — IT動詞',   file: '02_13_Call out.mp3',   label: 'Call out' },
-  { group: 'Unit 02 — IT動詞',   file: '02_14_Block.mp3',      label: 'Block' },
-  { group: 'Unit 02 — IT動詞',   file: '02_15_Capture.mp3',    label: 'Capture' },
-  { group: 'Unit 02 — IT動詞',   file: '02_16_Execute.mp3',    label: 'Execute' },
-  { group: 'Unit 02 — IT動詞',   file: '02_17_Conduct.mp3',    label: 'Conduct' },
-  { group: 'Unit 02 — IT動詞',   file: '02_18_Store.mp3',      label: 'Store' },
-  { group: 'Unit 02 — IT動詞',   file: '02_19_Talk.mp3',       label: 'Talk' },
-  { group: 'Unit 02 — IT動詞',   file: '02_20_Align.mp3',      label: 'Align' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 1.mp3',  label: 'Conversation 1' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 2.mp3',  label: 'Conversation 2' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 3.mp3',  label: 'Conversation 3' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 4.mp3',  label: 'Conversation 4' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 5.mp3',  label: 'Conversation 5' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 6.mp3',  label: 'Conversation 6' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 7.mp3',  label: 'Conversation 7' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 8.mp3',  label: 'Conversation 8' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 9.mp3',  label: 'Conversation 9' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 10.mp3', label: 'Conversation 10' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 11.mp3', label: 'Conversation 11' },
-  { group: 'Unit 03 — 会話練習', file: '03_Conversation 12.mp3', label: 'Conversation 12' },
+// ══════════════════════════════════════════════
+// 教材定義
+// ══════════════════════════════════════════════
+const MATERIALS = [
+  {
+    id: 'it30',
+    icon: '💻',
+    title: 'IT英語動詞30',
+    folder: 'it30',
+    pdf: 'IT英語動詞30.pdf',
+    tracks: [
+      { group: 'Unit 01 — 基本動詞', file: '01_01_Do.mp3',        label: 'Do' },
+      { group: 'Unit 01 — 基本動詞', file: '01_02_Have.mp3',      label: 'Have' },
+      { group: 'Unit 01 — 基本動詞', file: '01_03_Get1.mp3',      label: 'Get (1)' },
+      { group: 'Unit 01 — 基本動詞', file: '01_04_Get2.mp3',      label: 'Get (2)' },
+      { group: 'Unit 01 — 基本動詞', file: '01_05_Get3.mp3',      label: 'Get (3)' },
+      { group: 'Unit 01 — 基本動詞', file: '01_06_Give.mp3',      label: 'Give' },
+      { group: 'Unit 01 — 基本動詞', file: '01_07_Make.mp3',      label: 'Make' },
+      { group: 'Unit 01 — 基本動詞', file: '01_08_Take.mp3',      label: 'Take' },
+      { group: 'Unit 01 — 基本動詞', file: '01_09_Put.mp3',       label: 'Put' },
+      { group: 'Unit 01 — 基本動詞', file: '01_10_Go.mp3',        label: 'Go' },
+      { group: 'Unit 01 — 基本動詞', file: '01_11_Come.mp3',      label: 'Come' },
+      { group: 'Unit 01 — 基本動詞', file: '01_12_Look.mp3',      label: 'Look' },
+      { group: 'Unit 02 — IT動詞',   file: '02_01_Be.mp3',        label: 'Be' },
+      { group: 'Unit 02 — IT動詞',   file: '02_02_Need.mp3',      label: 'Need' },
+      { group: 'Unit 02 — IT動詞',   file: '02_03_Work.mp3',      label: 'Work' },
+      { group: 'Unit 02 — IT動詞',   file: '02_04_Find.mp3',      label: 'Find' },
+      { group: 'Unit 02 — IT動詞',   file: '02_05_Run.mp3',       label: 'Run' },
+      { group: 'Unit 02 — IT動詞',   file: '02_06_Follow up.mp3', label: 'Follow up' },
+      { group: 'Unit 02 — IT動詞',   file: '02_07_Update.mp3',    label: 'Update' },
+      { group: 'Unit 02 — IT動詞',   file: '02_08_Help.mp3',      label: 'Help' },
+      { group: 'Unit 02 — IT動詞',   file: '02_09_Happen.mp3',    label: 'Happen' },
+      { group: 'Unit 02 — IT動詞',   file: '02_10_Seem.mp3',      label: 'Seem' },
+      { group: 'Unit 02 — IT動詞',   file: '02_11_Discuss.mp3',   label: 'Discuss' },
+      { group: 'Unit 02 — IT動詞',   file: '02_12_Learn.mp3',     label: 'Learn' },
+      { group: 'Unit 02 — IT動詞',   file: '02_13_Call out.mp3',  label: 'Call out' },
+      { group: 'Unit 02 — IT動詞',   file: '02_14_Block.mp3',     label: 'Block' },
+      { group: 'Unit 02 — IT動詞',   file: '02_15_Capture.mp3',   label: 'Capture' },
+      { group: 'Unit 02 — IT動詞',   file: '02_16_Execute.mp3',   label: 'Execute' },
+      { group: 'Unit 02 — IT動詞',   file: '02_17_Conduct.mp3',   label: 'Conduct' },
+      { group: 'Unit 02 — IT動詞',   file: '02_18_Store.mp3',     label: 'Store' },
+      { group: 'Unit 02 — IT動詞',   file: '02_19_Talk.mp3',      label: 'Talk' },
+      { group: 'Unit 02 — IT動詞',   file: '02_20_Align.mp3',     label: 'Align' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 1.mp3',  label: 'Conversation 1' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 2.mp3',  label: 'Conversation 2' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 3.mp3',  label: 'Conversation 3' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 4.mp3',  label: 'Conversation 4' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 5.mp3',  label: 'Conversation 5' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 6.mp3',  label: 'Conversation 6' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 7.mp3',  label: 'Conversation 7' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 8.mp3',  label: 'Conversation 8' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 9.mp3',  label: 'Conversation 9' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 10.mp3', label: 'Conversation 10' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 11.mp3', label: 'Conversation 11' },
+      { group: 'Unit 03 — 会話練習', file: '03_Conversation 12.mp3', label: 'Conversation 12' },
+    ]
+  },
+  {
+    id: 'native80',
+    icon: '🌱',
+    title: 'ネイティブなら12歳までに覚える英語80パターン',
+    folder: 'native80',
+    pdf: [
+      'ネイティブなら12歳までに覚える英語80パターン_前半.pdf',
+      'ネイティブなら12歳までに覚える英語80パターン_後半.pdf',
+    ],
+    tracks: [
+      { group: 'Part 1 — 型01〜20',       file: '001 Tr01_型01.mp3', label: '型01' },
+      { group: 'Part 1 — 型01〜20',       file: '002 Tr02_型02.mp3', label: '型02' },
+      { group: 'Part 1 — 型01〜20',       file: '003 Tr03_型03.mp3', label: '型03' },
+      { group: 'Part 1 — 型01〜20',       file: '004 Tr04_型04.mp3', label: '型04' },
+      { group: 'Part 1 — 型01〜20',       file: '005 Tr05_型05.mp3', label: '型05' },
+      { group: 'Part 1 — 型01〜20',       file: '006 Tr06_型06.mp3', label: '型06' },
+      { group: 'Part 1 — 型01〜20',       file: '007 Tr07_型07.mp3', label: '型07' },
+      { group: 'Part 1 — 型01〜20',       file: '008 Tr08_型08.mp3', label: '型08' },
+      { group: 'Part 1 — 型01〜20',       file: '009 Tr09_型09.mp3', label: '型09' },
+      { group: 'Part 1 — 型01〜20',       file: '010 Tr10_型10.mp3', label: '型10' },
+      { group: 'Part 1 — 型01〜20',       file: '011 Tr11_型11.mp3', label: '型11' },
+      { group: 'Part 1 — 型01〜20',       file: '012 Tr12_型12.mp3', label: '型12' },
+      { group: 'Part 1 — 型01〜20',       file: '013 Tr13_型13.mp3', label: '型13' },
+      { group: 'Part 1 — 型01〜20',       file: '014 Tr14_型14.mp3', label: '型14' },
+      { group: 'Part 1 — 型01〜20',       file: '015 Tr15_型15.mp3', label: '型15' },
+      { group: 'Part 1 — 型01〜20',       file: '016 Tr16_型16.mp3', label: '型16' },
+      { group: 'Part 1 — 型01〜20',       file: '017 Tr17_型17.mp3', label: '型17' },
+      { group: 'Part 1 — 型01〜20',       file: '018 Tr18_型18.mp3', label: '型18' },
+      { group: 'Part 1 — 型01〜20',       file: '019 Tr19_型19.mp3', label: '型19' },
+      { group: 'Part 1 — 型01〜20',       file: '020 Tr20_型20.mp3', label: '型20' },
+      { group: 'Part 1 — 型01〜20',       file: '021 Tr21_EXERCISES&ANSWERS.mp3', label: 'Exercises & Answers' },
+      { group: 'Part 2 — 型21〜42',       file: '022 Tr22_型21.mp3', label: '型21' },
+      { group: 'Part 2 — 型21〜42',       file: '023 Tr23_型22.mp3', label: '型22' },
+      { group: 'Part 2 — 型21〜42',       file: '024 Tr24_型23.mp3', label: '型23' },
+      { group: 'Part 2 — 型21〜42',       file: '025 Tr25_型24.mp3', label: '型24' },
+      { group: 'Part 2 — 型21〜42',       file: '026 Tr26_型25.mp3', label: '型25' },
+      { group: 'Part 2 — 型21〜42',       file: '027 Tr27_型26.mp3', label: '型26' },
+      { group: 'Part 2 — 型21〜42',       file: '028 Tr28_型27.mp3', label: '型27' },
+      { group: 'Part 2 — 型21〜42',       file: '029 Tr29_型28.mp3', label: '型28' },
+      { group: 'Part 2 — 型21〜42',       file: '030 Tr30_型29.mp3', label: '型29' },
+      { group: 'Part 2 — 型21〜42',       file: '031 Tr31_型30.mp3', label: '型30' },
+      { group: 'Part 2 — 型21〜42',       file: '032 Tr32_型31.mp3', label: '型31' },
+      { group: 'Part 2 — 型21〜42',       file: '033 Tr33_型32.mp3', label: '型32' },
+      { group: 'Part 2 — 型21〜42',       file: '034 Tr34_型33.mp3', label: '型33' },
+      { group: 'Part 2 — 型21〜42',       file: '035 Tr35_型34.mp3', label: '型34' },
+      { group: 'Part 2 — 型21〜42',       file: '036 Tr36_型35.mp3', label: '型35' },
+      { group: 'Part 2 — 型21〜42',       file: '037 Tr37_型36.mp3', label: '型36' },
+      { group: 'Part 2 — 型21〜42',       file: '038 Tr38_型37.mp3', label: '型37' },
+      { group: 'Part 2 — 型21〜42',       file: '039 Tr39_型38.mp3', label: '型38' },
+      { group: 'Part 2 — 型21〜42',       file: '040 Tr40_型39.mp3', label: '型39' },
+      { group: 'Part 2 — 型21〜42',       file: '041 Tr41_型40.mp3', label: '型40' },
+      { group: 'Part 2 — 型21〜42',       file: '042 Tr42_型41.mp3', label: '型41' },
+      { group: 'Part 2 — 型21〜42',       file: '043 Tr43_型42.mp3', label: '型42' },
+      { group: 'Part 2 — 型21〜42',       file: '044 Tr44_EXERCISES&ANSWERS.mp3', label: 'Exercises & Answers' },
+      { group: 'Part 3 — 型43〜66',       file: '045 Tr45_型43.mp3', label: '型43' },
+      { group: 'Part 3 — 型43〜66',       file: '046 Tr46_型44.mp3', label: '型44' },
+      { group: 'Part 3 — 型43〜66',       file: '047 Tr47_型45.mp3', label: '型45' },
+      { group: 'Part 3 — 型43〜66',       file: '048 Tr48_型46.mp3', label: '型46' },
+      { group: 'Part 3 — 型43〜66',       file: '049 Tr49_型47.mp3', label: '型47' },
+      { group: 'Part 3 — 型43〜66',       file: '050 Tr50_型48.mp3', label: '型48' },
+      { group: 'Part 3 — 型43〜66',       file: '051 Tr51_型49.mp3', label: '型49' },
+      { group: 'Part 3 — 型43〜66',       file: '052 Tr52_型50.mp3', label: '型50' },
+      { group: 'Part 3 — 型43〜66',       file: '053 Tr53_型51.mp3', label: '型51' },
+      { group: 'Part 3 — 型43〜66',       file: '054 Tr54_型52.mp3', label: '型52' },
+      { group: 'Part 3 — 型43〜66',       file: '055 Tr55_型53.mp3', label: '型53' },
+      { group: 'Part 3 — 型43〜66',       file: '056 Tr56_型54.mp3', label: '型54' },
+      { group: 'Part 3 — 型43〜66',       file: '057 Tr57_型55.mp3', label: '型55' },
+      { group: 'Part 3 — 型43〜66',       file: '058 Tr58_型56.mp3', label: '型56' },
+      { group: 'Part 3 — 型43〜66',       file: '059 Tr59_型57.mp3', label: '型57' },
+      { group: 'Part 3 — 型43〜66',       file: '060 Tr60_型58.mp3', label: '型58' },
+      { group: 'Part 3 — 型43〜66',       file: '061 Tr61_型59.mp3', label: '型59' },
+      { group: 'Part 3 — 型43〜66',       file: '062 Tr62_型60.mp3', label: '型60' },
+      { group: 'Part 3 — 型43〜66',       file: '063 Tr63_型61.mp3', label: '型61' },
+      { group: 'Part 3 — 型43〜66',       file: '064 Tr64_型62.mp3', label: '型62' },
+      { group: 'Part 3 — 型43〜66',       file: '065 Tr65_型63.mp3', label: '型63' },
+      { group: 'Part 3 — 型43〜66',       file: '066 Tr66_型64.mp3', label: '型64' },
+      { group: 'Part 3 — 型43〜66',       file: '067 Tr67_型65.mp3', label: '型65' },
+      { group: 'Part 3 — 型43〜66',       file: '068 Tr68_型66.mp3', label: '型66' },
+      { group: 'Part 3 — 型43〜66',       file: '009 Tr69_EXERCISES&ANSWERS.mp3', label: 'Exercises & Answers' },
+      { group: 'Part 4 — 型67〜80',       file: '010 Tr70_型67.mp3', label: '型67' },
+      { group: 'Part 4 — 型67〜80',       file: '011 Tr71_型68.mp3', label: '型68' },
+      { group: 'Part 4 — 型67〜80',       file: '012 Tr72_型69.mp3', label: '型69' },
+      { group: 'Part 4 — 型67〜80',       file: '013 Tr73_型70.mp3', label: '型70' },
+      { group: 'Part 4 — 型67〜80',       file: '014 Tr74_型71.mp3', label: '型71' },
+      { group: 'Part 4 — 型67〜80',       file: '015 Tr75_型72.mp3', label: '型72' },
+      { group: 'Part 4 — 型67〜80',       file: '016 Tr76_型73.mp3', label: '型73' },
+      { group: 'Part 4 — 型67〜80',       file: '017 Tr77_型74.mp3', label: '型74' },
+      { group: 'Part 4 — 型67〜80',       file: '018 Tr78_型75.mp3', label: '型75' },
+      { group: 'Part 4 — 型67〜80',       file: '019 Tr79_型76.mp3', label: '型76' },
+      { group: 'Part 4 — 型67〜80',       file: '020 Tr80_型77.mp3', label: '型77' },
+      { group: 'Part 4 — 型67〜80',       file: '021 Tr81_型78.mp3', label: '型78' },
+      { group: 'Part 4 — 型67〜80',       file: '022 Tr82_型79.mp3', label: '型79' },
+      { group: 'Part 4 — 型67〜80',       file: '023 Tr83_型80.mp3', label: '型80' },
+      { group: 'Part 4 — 型67〜80',       file: '024 Tr84_EXERCISES&ANSWERS.mp3', label: 'Exercises & Answers' },
+    ]
+  }
 ];
 
-// ── 状態 ──────────────────────────────────────
+// ══════════════════════════════════════════════
+// 状態
+// ══════════════════════════════════════════════
 const audio = document.getElementById('audio');
 const playBtn = document.getElementById('play-btn');
 const playIcon = document.getElementById('play-icon');
@@ -234,73 +381,126 @@ const currentTimeEl = document.getElementById('current-time');
 const durationEl = document.getElementById('duration');
 const speedBtn = document.getElementById('speed-btn');
 const trackName = document.getElementById('track-name');
-const backBtn = document.getElementById('back10-btn');
-const fwdBtn = document.getElementById('fwd10-btn');
 const sectionRow = document.getElementById('section-row');
-const markBtn = document.getElementById('mark-btn');
 const labelInput = document.getElementById('section-label-input');
 const pageInfo = document.getElementById('page-info');
 const pdfArea = document.getElementById('pdf-area');
-const libraryOverlay = document.getElementById('library-overlay');
-const libraryList = document.getElementById('library-list');
 
 const speeds = [0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
 let speedIdx = 2;
 let sections = [];
 let pageInfoTimer;
+let currentMaterial = null;   // MATERIALSのオブジェクト
 let currentTrackIdx = null;
 let spreadMode = false;
 let currentPdfDoc = null;
 let currentPdfTotal = 0;
 
-// ── ライブラリ描画 ────────────────────────────
+// ── 教材切替 ──────────────────────────────────
+function selectMaterial(mat) {
+  if (currentMaterial && currentMaterial.id === mat.id) { closeMaterialSheet(); return; }
+  // 再生停止・セクション保存
+  audio.pause(); audio.src = '';
+  saveSections();
+  currentMaterial = mat;
+  currentTrackIdx = null;
+  sections = [];
+  renderSections();
+  document.getElementById('material-name').textContent = mat.title;
+  trackName.textContent = 'トラックを選択してください';
+  trackName.classList.remove('loaded');
+  closeMaterialSheet();
+  loadPDF();
+}
+
+function renderMaterialList() {
+  const list = document.getElementById('material-list');
+  list.innerHTML = '';
+  MATERIALS.forEach(mat => {
+    const item = document.createElement('div');
+    item.className = 'mat-item' + (currentMaterial && currentMaterial.id === mat.id ? ' active' : '');
+    item.innerHTML = `
+      <div class="mat-icon">${mat.icon}</div>
+      <div class="mat-meta">
+        <div class="mat-title">${mat.title}</div>
+        <div class="mat-sub">${mat.tracks.length} トラック</div>
+      </div>
+    `;
+    item.addEventListener('click', () => selectMaterial(mat));
+    list.appendChild(item);
+  });
+}
+
+function openMaterialSheet() { renderMaterialList(); document.getElementById('material-overlay').classList.add('open'); }
+function closeMaterialSheet() { document.getElementById('material-overlay').classList.remove('open'); }
+document.getElementById('material-btn').addEventListener('click', openMaterialSheet);
+document.getElementById('material-close').addEventListener('click', closeMaterialSheet);
+document.getElementById('material-overlay').addEventListener('click', e => { if (e.target === document.getElementById('material-overlay')) closeMaterialSheet(); });
+
+// ── トラック再生 ──────────────────────────────
+function playTrack(idx) {
+  if (!currentMaterial) return;
+  saveSections();
+  currentTrackIdx = idx;
+  const t = currentMaterial.tracks[idx];
+  const path = currentMaterial.folder + '/' + encodeURIComponent(t.file);
+  audio.src = path;
+  audio.playbackRate = speeds[speedIdx];
+  trackName.textContent = t.label;
+  trackName.classList.add('loaded');
+  sections = loadSectionsForTrack(currentMaterial.id, idx);
+  renderSections();
+  audio.play().catch(() => {});
+}
+
+// ── ライブラリUI ──────────────────────────────
 function renderLibrary() {
-  libraryList.innerHTML = '';
+  const list = document.getElementById('library-list');
+  if (!currentMaterial) { list.innerHTML = '<p style="padding:20px;color:var(--text2);text-align:center;font-size:13px">教材を選択してください</p>'; return; }
+  list.innerHTML = '';
   let lastGroup = '';
-  TRACKS.forEach((t, i) => {
+  currentMaterial.tracks.forEach((t, i) => {
     if (t.group !== lastGroup) {
       const g = document.createElement('div');
       g.className = 'lib-group-label';
       g.textContent = t.group;
-      libraryList.appendChild(g);
+      list.appendChild(g);
       lastGroup = t.group;
     }
     const item = document.createElement('div');
     item.className = 'lib-item' + (i === currentTrackIdx ? ' playing' : '');
-    const numStr = String(i + 1).padStart(2, '0');
+    const num = String(i + 1).padStart(2, '0');
     item.innerHTML = `
-      <div class="lib-num">${numStr}</div>
+      <div class="lib-num">${num}</div>
       <div style="flex:1;overflow:hidden">
         <div class="lib-title">${t.label}</div>
         ${i === currentTrackIdx ? '<div class="lib-now">▶ 再生中</div>' : ''}
       </div>
     `;
     item.addEventListener('click', () => { playTrack(i); closeLibrary(); });
-    libraryList.appendChild(item);
+    list.appendChild(item);
   });
+  // 再生中アイテムへスクロール
+  setTimeout(() => {
+    const playing = list.querySelector('.lib-item.playing');
+    if (playing) playing.scrollIntoView({ block: 'center' });
+  }, 50);
 }
 
-function playTrack(idx) {
-  saveSections();
-  currentTrackIdx = idx;
-  const t = TRACKS[idx];
-  audio.src = encodeURIComponent(t.file);
-  audio.playbackRate = speeds[speedIdx];
-  trackName.textContent = t.label;
-  trackName.classList.add('loaded');
-  sections = loadSectionsForTrack(idx);
-  renderSections();
-  audio.play().catch(() => {});
-}
+function openLibrary() { renderLibrary(); document.getElementById('library-overlay').classList.add('open'); }
+function closeLibrary() { document.getElementById('library-overlay').classList.remove('open'); }
+document.getElementById('library-btn').addEventListener('click', openLibrary);
+document.getElementById('library-close').addEventListener('click', closeLibrary);
+document.getElementById('library-overlay').addEventListener('click', e => { if (e.target === document.getElementById('library-overlay')) closeLibrary(); });
 
 // ── セクション ────────────────────────────────
-function sectionsKey(idx) { return 'it_sec_' + idx; }
+function sectionsKey(matId, idx) { return `sec_${matId}_${idx}`; }
 function saveSections() {
-  if (currentTrackIdx === null) return;
-  try { localStorage.setItem(sectionsKey(currentTrackIdx), JSON.stringify(sections)); } catch(e) {}
+  if (!currentMaterial || currentTrackIdx === null) return;
+  try { localStorage.setItem(sectionsKey(currentMaterial.id, currentTrackIdx), JSON.stringify(sections)); } catch(e) {}
 }
-function loadSectionsForTrack(idx) {
-  try { const s = localStorage.getItem(sectionsKey(idx)); return s ? JSON.parse(s) : []; } catch(e) { return []; }
+function loadSectionsForTrack(matId, idx) {
+  try { const s = localStorage.getItem(sectionsKey(matId, idx)); return s ? JSON.parse(s) : []; } catch(e) { return []; }
 }
 function renderSections() {
   sectionRow.innerHTML = '';
@@ -313,6 +513,12 @@ function renderSections() {
     sectionRow.appendChild(btn);
   });
 }
+document.getElementById('mark-btn').addEventListener('click', () => {
+  if (!audio.src) return;
+  sections.push({ t: audio.currentTime, label: labelInput.value.trim() || fmt(audio.currentTime) });
+  labelInput.value = '';
+  renderSections(); saveSections();
+});
 
 // ── 音声イベント ──────────────────────────────
 function fmt(s) { s = Math.floor(s||0); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); }
@@ -331,16 +537,16 @@ audio.addEventListener('play', () => setPlayIcon(true));
 audio.addEventListener('pause', () => setPlayIcon(false));
 audio.addEventListener('ended', () => {
   setPlayIcon(false);
-  // 次のトラックへ自動進行
-  if (currentTrackIdx !== null && currentTrackIdx < TRACKS.length - 1) {
+  if (!currentMaterial || currentTrackIdx === null) return;
+  if (currentTrackIdx < currentMaterial.tracks.length - 1) {
     playTrack(currentTrackIdx + 1);
     renderLibrary();
   }
 });
 
 playBtn.addEventListener('click', () => { if (audio.src) { audio.paused ? audio.play() : audio.pause(); } });
-backBtn.addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 10); });
-fwdBtn.addEventListener('click', () => { audio.currentTime = Math.min(audio.duration||0, audio.currentTime + 10); });
+document.getElementById('back10-btn').addEventListener('click', () => { audio.currentTime = Math.max(0, audio.currentTime - 10); });
+document.getElementById('fwd10-btn').addEventListener('click', () => { audio.currentTime = Math.min(audio.duration||0, audio.currentTime + 10); });
 progress.addEventListener('input', () => {
   if (audio.duration) { audio.currentTime = (progress.value/100)*audio.duration; progressFill.style.width = progress.value+'%'; }
 });
@@ -349,41 +555,59 @@ speedBtn.addEventListener('click', () => {
   audio.playbackRate = speeds[speedIdx];
   speedBtn.textContent = speeds[speedIdx].toFixed(2).replace(/\.?0+$/,'') + '×';
 });
-markBtn.addEventListener('click', () => {
-  if (!audio.src) return;
-  const t = audio.currentTime;
-  sections.push({ t, label: labelInput.value.trim() || fmt(t) });
-  labelInput.value = '';
-  renderSections(); saveSections();
-});
 
-// ── ライブラリUI ──────────────────────────────
-function openLibrary() { renderLibrary(); libraryOverlay.classList.add('open'); }
-function closeLibrary() { libraryOverlay.classList.remove('open'); }
-document.getElementById('library-btn').addEventListener('click', openLibrary);
-document.getElementById('library-close').addEventListener('click', closeLibrary);
-libraryOverlay.addEventListener('click', e => { if (e.target === libraryOverlay) closeLibrary(); });
-
-// ── 見開きボタン ──────────────────────────────
+// ── 見開き ────────────────────────────────────
 const spreadBtn = document.getElementById('spread-btn');
 spreadBtn.addEventListener('click', () => {
   spreadMode = !spreadMode;
   spreadBtn.classList.toggle('on', spreadMode);
-  if (currentPdfDoc) rerenderPDF();
+  if (currentPdfDocs.length > 0) rerenderPDF();
 });
 
 // ── PDF ──────────────────────────────────────
+// currentPdfDoc は単一 or 配列に対応
+// pdfFiles: string | string[]
+
+let currentPdfDocs = [];   // 複数ファイル対応（常に配列で管理）
+let currentPdfTotal = 0;
+// 後方互換のため currentPdfDoc は最初の1件を指す
+let currentPdfDoc = null;
+
 async function loadPDF() {
   const loadingMsg = document.getElementById('loading-msg');
+  const pagesDiv = document.getElementById('pdf-pages');
+  loadingMsg.style.display = 'flex';
+  loadingMsg.innerHTML = '<div class="spinner"></div><span>PDF読み込み中...</span>';
+  pagesDiv.innerHTML = '';
+  currentPdfDocs = [];
+  currentPdfTotal = 0;
   try {
-    const url = encodeURIComponent(PDF_FILE);
-    currentPdfDoc = await pdfjsLib.getDocument(url).promise;
-    currentPdfTotal = currentPdfDoc.numPages;
+    const pdfDef = currentMaterial.pdf;
+    const files = Array.isArray(pdfDef) ? pdfDef : [pdfDef];
+    for (const filename of files) {
+      const url = currentMaterial.folder + '/' + encodeURIComponent(filename);
+      const doc = await pdfjsLib.getDocument(url).promise;
+      currentPdfDocs.push(doc);
+      currentPdfTotal += doc.numPages;
+    }
+    currentPdfDoc = currentPdfDocs[0];
     loadingMsg.style.display = 'none';
     await rerenderPDF();
   } catch(e) {
-    loadingMsg.textContent = 'PDFの読み込みに失敗しました';
+    loadingMsg.innerHTML = '<span>PDFの読み込みに失敗しました</span>';
   }
+}
+
+// グローバルページ番号（1始まり）→ {doc, localPage} に変換
+function resolveGlobalPage(globalPage) {
+  let offset = 0;
+  for (const doc of currentPdfDocs) {
+    if (globalPage <= offset + doc.numPages) {
+      return { doc, localPage: globalPage - offset };
+    }
+    offset += doc.numPages;
+  }
+  return null;
 }
 
 async function rerenderPDF() {
@@ -394,25 +618,27 @@ async function rerenderPDF() {
     pagesDiv.classList.add('spread');
     for (let i = 1; i <= currentPdfTotal; ) {
       if (i === 1) {
-        const c = await renderPage(i, vw - 16); c.dataset.page = i; pagesDiv.appendChild(c); i++;
+        const c = await renderGlobalPage(i, vw - 16); c.dataset.page = i; pagesDiv.appendChild(c); i++;
       } else {
         const pair = document.createElement('div'); pair.className = 'spread-pair';
-        const c1 = await renderPage(i, Math.floor((vw-8)/2)); c1.dataset.page = i; pair.appendChild(c1); i++;
-        if (i <= currentPdfTotal) { const c2 = await renderPage(i, Math.floor((vw-8)/2)); c2.dataset.page = i; pair.appendChild(c2); i++; }
+        const c1 = await renderGlobalPage(i, Math.floor((vw-8)/2)); c1.dataset.page = i; pair.appendChild(c1); i++;
+        if (i <= currentPdfTotal) { const c2 = await renderGlobalPage(i, Math.floor((vw-8)/2)); c2.dataset.page = i; pair.appendChild(c2); i++; }
         pagesDiv.appendChild(pair);
       }
     }
   } else {
     pagesDiv.classList.remove('spread');
     for (let i = 1; i <= currentPdfTotal; i++) {
-      const c = await renderPage(i, vw - 16); c.dataset.page = i; pagesDiv.appendChild(c);
+      const c = await renderGlobalPage(i, vw - 16); c.dataset.page = i; pagesDiv.appendChild(c);
     }
   }
   setupPageObserver(currentPdfTotal);
 }
 
-async function renderPage(pageNum, widthPx) {
-  const page = await currentPdfDoc.getPage(pageNum);
+async function renderGlobalPage(globalPage, widthPx) {
+  const resolved = resolveGlobalPage(globalPage);
+  if (!resolved) return document.createElement('canvas');
+  const page = await resolved.doc.getPage(resolved.localPage);
   const vp0 = page.getViewport({ scale: 1 });
   const vp = page.getViewport({ scale: widthPx / vp0.width });
   const canvas = document.createElement('canvas');
@@ -435,9 +661,6 @@ function setupPageObserver(total) {
   }, { threshold: 0.3 });
   document.querySelectorAll('#pdf-pages canvas[data-page]').forEach(c => obs.observe(c));
 }
-
-// ── 起動 ─────────────────────────────────────
-loadPDF();
 </script>
 </body>
 </html>
